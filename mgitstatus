@@ -19,6 +19,7 @@ If DEPTH=0, the scan is infinitely deep.
   -e         Exclude repos that are 'ok'
   -f         Do a 'git fetch' on each repo (slow for many repos)
   -c         Force color output (preserve colors when using pipes)
+  --branch   Show branch in ouput
 
 You can limit output with the following options:
 
@@ -37,6 +38,7 @@ WARN_NOT_REPO=0
 EXCLUDE_OK=0
 DO_FETCH=0
 FORCE_COLOR=0
+SHOW_BRANCH=0
 NO_PUSH=0
 NO_PULL=0
 NO_UPSTREAM=0
@@ -68,6 +70,9 @@ while [ -n "$1" ]; do
     if [ "$1" = "-c" ]; then
         FORCE_COLOR=1
     fi
+	if [ "$1" = "--branch" ]; then
+	    SHOW_BRANCH=1
+	fi
     if [ "$1" = "--no-push" ]; then
         NO_PUSH=1
     fi
@@ -229,6 +234,13 @@ do
     STASHES=$(git stash list | wc -l)
     cd "$OLDPWD" || exit
 
+	# Provide the current branch name
+	BNAME=""
+	if [ "$SHOW_BRANCH" -eq 1 ]; then
+	cd "$(dirname "$GIT_DIR")" || exit
+	BNAME=" ($(git symbolic-ref --short HEAD 2>/dev/null))"
+	cd "$OLDPWD" || exit
+	fi
     # Build up the status string
     IS_OK=0  # 0 = Repo needs something, 1 = Repo needs nothing ('ok')
     STATUS_NEEDS=""
@@ -257,6 +269,6 @@ do
 
     # Print the output, unless repo is 'ok' and -e was specified
     if [ "$IS_OK" -ne 1 ] || [ "$EXCLUDE_OK" -ne 1 ]; then
-        printf "${PROJ_DIR}: $STATUS_NEEDS\n"
+        printf "${PROJ_DIR}$BNAME: $STATUS_NEEDS\n"
     fi
 done
