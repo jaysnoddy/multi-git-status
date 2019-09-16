@@ -125,7 +125,7 @@ C_UNTRACKED="$C_CYAN"
 C_STASHES="$C_YELLOW"
 
 # Find all .git dirs, up to DEPTH levels deep
-find -L "$ROOT_DIR" ${DEPTH:+"-maxdepth"} ${DEPTH:+"$DEPTH"} -type d | while read -r PROJ_DIR
+find -L "$ROOT_DIR" ${DEPTH:+"-maxdepth"} ${DEPTH:+"$DEPTH"} -type d | sort | while read -r PROJ_DIR
 do
     GIT_DIR="$PROJ_DIR/.git"
     GIT_CONF="$PROJ_DIR/.git/config"
@@ -139,7 +139,7 @@ do
     # If this dir is not a repo, and WARN_NOT_REPO is 1, tell the user.
     if [ ! -d "$GIT_DIR" ]; then
         if [ "$WARN_NOT_REPO" -eq 1 ] && [ "$PROJ_DIR" != "." ]; then
-            printf "${PROJ_DIR}: not a git repo\n"
+            printf "${PROJ_DIR}: Not a git repo\n"
         fi
         continue
     fi
@@ -248,11 +248,11 @@ do
         STATUS_NEEDS="${STATUS_NEEDS}${C_UNTRACKED}Untracked files${C_RESET} "
     fi
     if [ "$STASHES" -ne 0 ] && [ "$NO_STASHES" -eq 0 ]; then
-        STATUS_NEEDS="${STATUS_NEEDS}${C_STASHES}$STASHES stashes${C_RESET} "
+        STATUS_NEEDS="${STATUS_NEEDS}${C_STASHES}$STASHES Stashes${C_RESET} "
     fi
     if [ "$STATUS_NEEDS" = "" ]; then
         IS_OK=1
-        STATUS_NEEDS="${STATUS_NEEDS}${C_OK}ok${C_RESET} "
+        STATUS_NEEDS="${STATUS_NEEDS}${C_OK}Ok${C_RESET} "
     fi
 
     # Print the output, unless repo is 'ok' and -e was specified
